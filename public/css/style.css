@@ -1,6 +1,8 @@
+/* set the title in red */
 h1{
     color: red;
 }
+/* strike through the completed  */
 .completed{
     color: gray;
     text-decoration: line-through;
