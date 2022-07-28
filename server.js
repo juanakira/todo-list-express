@@ -43,7 +43,9 @@ app.get('/',async (request, response)=>{
     const itemsLeft = await db.collection('todos').countDocuments({completed: false})
         // Render the 'index.ejs' file passing it the objects you've retrieved from the db
     response.render('index.ejs', { items: todoItems, left: itemsLeft })
+    
     // Promise chaining way of doing it
+
     // db.collection('todos').find().toArray()
     // .then(data => {
     //     db.collection('todos').countDocuments({completed: false})
@@ -70,10 +72,10 @@ app.post('/addTodo', (request, response) => {
 
     // PUT at /markComplete
 app.put('/markComplete', (request, response) => {
-    // using the Mongo 'updateOne' method to update the item that coincides with the text
+    // using the Mongo 'updateOne' method to update the item that coincides with the text that the frontend sends
         // db.collection.updateOne(<filter>, <update>, {})
     db.collection('todos').updateOne(
-        // filter: updates the collection using the 'itemFromJS' text that the frontend passed while making the request
+        // <filter>: object whose "thing" value is the text from the request (text that the client sent, check 'itemFromJS' in main.js)
     {  
         thing: request.body.itemFromJS
     },
@@ -85,7 +87,8 @@ app.put('/markComplete', (request, response) => {
     },
         // rest of params
     {
-        // not sure what this does, it's not in the docs, seems to work fine without this
+        // not sure what this does, it's not in the docs, https://mongodb.github.io/node-mongodb-native/3.6/api/MongoClient.html
+        // seems to work fine without this
         // i think this 'sort' param is used in the findOneAndUpdate method, and is mistakingly being used here
         sort: {_id: -1},
         // upsert when true creates a new document if nothing matches the query
@@ -96,34 +99,36 @@ app.put('/markComplete', (request, response) => {
         console.log('Marked Complete')
         response.json('Marked Complete')
     })
+    // if the promise fails logs the error to the console
     .catch(error => console.error(error))
 
 })
-    // PUT at /markComplete
+    // PUT request at /markUnComplete
 app.put('/markUnComplete', (request, response) => {
-
-    db.collection('todos').updateOne({thing: request.body.itemFromJS},{
+    
+    db.collection('todos').updateOne(
+    {
+        thing: request.body.itemFromJS
+    },
+    {
         $set: {
             completed: false
           }
     },
-    
     {
-        // not sure what this does, it's not in the docs, seems to work fine without this
-        // i think this 'sort' param is used in the findOneAndUpdate method, and is mistakingly being used here
         sort: {_id: -1},
-    // upsert when true creates a new document if nothing matches the query
         upsert: false
     })
     .then(result => {
-        console.log('Marked Complete')
-        response.json('Marked Complete')
+        console.log('Marked Uncomplete')
+        response.json('Marked Uncomplete')
     })
     .catch(error => console.error(error))
 
 })
-
+    // DELETE request at /deleteItem
 app.delete('/deleteItem', (request, response) => {
+    // using the Mongo 'updateOne' method to update the item that coincides with the text that the frontend sends
     db.collection('todos').deleteOne({thing: request.body.itemFromJS})
     .then(result => {
         console.log('Todo Deleted')
@@ -133,6 +138,9 @@ app.delete('/deleteItem', (request, response) => {
 
 })
 
+// Starts the listening process and logs the port it's listening on
+        // The process.env.PORT looks at the environment variables to check if there's a PORT listed in them, and uses that
+        // it's useful for production/deployment, e.g. on Heroku
 app.listen(process.env.PORT || PORT, ()=>{
     console.log(`Server running on port ${PORT}`)
 })

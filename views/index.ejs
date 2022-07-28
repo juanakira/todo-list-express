@@ -20,11 +20,16 @@
 <body>
     <h1>Todo List: </h1>
     <ul class="todoItems">
-    <% for(let i=0; i < items.length; i++) {%>
+        <%# for loop that loops thru the "items" array that the server passed on
+         and creates an li element for each item %> 
+    <%  for(let i=0; i < items.length; i++) {%>
         <li class="item">
-            <% if(items[i].completed === true) {%>
+            <%# If the item is completed it puts the 'thing' attribute's content
+                in a span with the completed class %>
+            <%  if(items[i].completed === true) {%>
                 <span class='completed'><%= items[i].thing %></span>
             <% }else{ %>
+                <%# If it isn't it puts the content in a classless span %>
                 <span><%= items[i].thing %></span>
             <% } %>    
             <span class='fa fa-trash'></span>
@@ -32,7 +37,8 @@
     <% } %>
     </ul>
 
-    <h2>Left to do: <%= left %></h2>
+    <h2>Left to do: <%= // adds the 'left' value to an H2
+        left %></h2>
 
     <h2>Add A Todo:</h2>
 
